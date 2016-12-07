@@ -29,3 +29,11 @@ Differences are reported as one or more change records. Change records have the 
 * `mine` - the value on mine (undefined if kind === 'D')
 * `index` - when kind === 'A', indicates the array index where the change occurred
 * `item` - when kind === 'A', contains a nested change record indicating the change that occurred at the array index
+
+### Options
+Options object can be used to denote certain flags.  Object should be keyed on path.
+
+* Structure: `{ [PATH]: { [KEY]: [VALUE] }}`
+
+Flags
+* `ignoreOrder` - Compares arrays without maintaining order
