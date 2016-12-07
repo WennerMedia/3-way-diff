@@ -74,7 +74,7 @@ function processKeyValuePair(key, value, parent, theirs, mine, path, options) {
   }
   else if(_.isObject(value)) {
     path.push(key);
-    var differences = recurse(parent[key], theirs[key], mine[key], path);
+    var differences = recurse(parent[key], theirs[key], mine[key], path, options);
     if(differences) {
       results = results.concat(differences);
     }
