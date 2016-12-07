@@ -1,7 +1,7 @@
 var assert = require('assert');
 var diff = require('../index.js');
 
-describe('Diff', function() {
+describe('Literals Diff', function() {
   it('parent is not an object', function() {
     assert.throws(function() { diff('', {}, {}); }, /Parent must be an object/);
   });
@@ -120,7 +120,7 @@ describe('Diff', function() {
 
   it('both children edit same key to same values', function() {
     var parent = {
-      key: 'value'
+      key: 'value',
     };
     var theirs = {
       key: 'value1'
