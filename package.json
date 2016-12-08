@@ -3,6 +3,16 @@
   "version": "0.0.1",
   "description": "3-way diffing of JavaScript objects",
   "main": "index.js",
+  "authors": [
+    {
+      "name": "Shawn Walsh",
+      "url": "https://github.com/shawnpwalsh"
+    },
+    {
+      "name": "Markham F Rollins IV",
+      "url": "https://github.com/mrollinsiv"
+    }
+  ],
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec ./test"
   },

@@ -1,5 +1,27 @@
+/**
+ *
+ * 3 Way Difference for objects to determine conflicts/edits
+ *
+ * @package 3-way-diff
+ * @author Shawn Walsh
+ * @author Markham F Rollins IV
+ *
+ */
+
+'use strict';
+
+// Dependencies
 var _ = require('lodash');
 
+/**
+ * 3-way-diff Constructor
+ *
+ * @param {object} parent - Object with parent values
+ * @param {object} theirs - Object with their changes
+ * @param {object} mine - Object with my changes
+ * @param {object} options - Key specific options for diff
+ * @returns {Array} - Array of objects specifying the differences
+ */
 module.exports = function(parent, theirs, mine, options) {
   options = options || {};
 
@@ -20,6 +42,16 @@ module.exports = function(parent, theirs, mine, options) {
   return recurse(parent, theirs, mine, [], options);
 };
 
+/**
+ * Recursively traverse the objects to handle 3-way-diff
+ *
+ * @param {object} parent - Object with parent values
+ * @param {object} theirs - Object with their changes
+ * @param {object} mine - Object with my changes
+ * @param {array} path - Path to value in parent/theirs/mine
+ * @param {object} options - Key specific options for diff
+ * @returns {Array} - Array of objects specifying the differences
+ */
 function recurse(parent, theirs, mine, path, options) {
   var path = path || [];
   var results = [];
@@ -40,6 +72,18 @@ function recurse(parent, theirs, mine, path, options) {
   return results;
 }
 
+/**
+ * Determine process in which key/value should be compared
+ *
+ * @param key - The current object key to dif
+ * @param value - The current object value to diff
+ * @param {object} parent - Object with parent values
+ * @param {object} theirs - Object with their changes
+ * @param {object} mine - Object with my changes
+ * @param {array} path - Path to value in parent/theirs/mine
+ * @param {object} options - Key specific options for diff
+ * @returns {Array} - Array of objects specifying the differences
+ */
 function processKeyValuePair(key, value, parent, theirs, mine, path, options) {
   var results = [];
 
@@ -87,6 +131,16 @@ function processKeyValuePair(key, value, parent, theirs, mine, path, options) {
   return results;
 }
 
+/**
+ * Compare the values in parent/theirs/mine to determine type of conflict/edit (if any)
+ *
+ * @param {object} parent - Object with parent values
+ * @param {object} theirs - Object with their changes
+ * @param {object} mine - Object with my changes
+ * @param {array} path - Path to value in parent/theirs/mine
+ * @param {object} options - Key specific options for diff
+ * @returns {*} - An object containing the conflict/edit, otherwise empty return
+ */
 function compareValues(parent, theirs, mine, path, options) {
   if(_.isUndefined(parent) && _.isUndefined(theirs) && !_.isUndefined(mine)) {
     // Mine is new: 'N'

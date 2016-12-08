@@ -31,9 +31,39 @@ Differences are reported as one or more change records. Change records have the 
 * `item` - when kind === 'A', contains a nested change record indicating the change that occurred at the array index
 
 ### Options
-Options object can be used to denote certain flags.  Object should be keyed on path.
+Options object can be used to denote certain flags.  Object should be replica of `mine` with flags set on specific keys
+#### Example
 
-* Structure: `{ [PATH]: { [KEY]: [VALUE] }}`
+Mine:
+````
+{ 
+  key1: { 
+    childKey1: { 
+      key: value
+    },
+    childKey2: value
+  },
+  key2: {
+    childKey1: value
+  }
+}
+````
+
+Options:
+````
+{ 
+  key1: { 
+    childKey1: { 
+      ignoreKey: true 
+    },
+    ignoreOrder: true, 
+  },
+  key2: {
+    ignoreKey: true
+  }
+}
+````
 
 Flags
+* `ignoreKey` - Do not diff this key
 * `ignoreOrder` - Compares arrays without maintaining order
