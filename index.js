@@ -43,42 +43,45 @@ function recurse(parent, theirs, mine, path, options) {
 function processKeyValuePair(key, value, parent, theirs, mine, path, options) {
   var results = [];
 
-  if(!_.isArray(value) && !_.isObject(value)) {
-    path.push(key);
-    var differences = compareValues(parent[key], theirs[key], mine[key], path, options);
-    if(differences) {
-      results = results.concat(differences);
-    }
-    path.pop();
-  }
-  else if(_.isArray(value)) {
-    var array = value;
-    // If single dimension array run the comparison
-    if (value.filter(function(i){
-        return !_.isArray(i) && !_.isObject(i);
-      }).length == value.length) {
+  // Only process keys that have no options, or have not been flagged as ignored
+  if (_.isUndefined(options[key]) || (!_.isUndefined(options[key]) && !options[key]['ignoreKey'])) {
+    if (!_.isArray(value) && !_.isObject(value)) {
       path.push(key);
-      var differences = compareValues(parent[key], theirs[key], mine[key], path, options);
-      if(differences) {
+      var differences = compareValues(parent[key], theirs[key], mine[key], path, options[key] || {});
+      if (differences) {
         results = results.concat(differences);
       }
-      path.pop(key);
+      path.pop();
     }
-    _.forOwn(array, function(value, key) {
-      if(!_.isArray(value) && !_.isObject(value)) {
-
-      } else {
-        // TODO handle arrays of arrays or objects
+    else if (_.isArray(value)) {
+      var array = value;
+      // If single dimension array run the comparison
+      if (value.filter(function (i) {
+          return !_.isArray(i) && !_.isObject(i);
+        }).length == value.length) {
+        path.push(key);
+        var differences = compareValues(parent[key], theirs[key], mine[key], path, options[key] || {});
+        if (differences) {
+          results = results.concat(differences);
+        }
+        path.pop(key);
       }
-    });
-  }
-  else if(_.isObject(value)) {
-    path.push(key);
-    var differences = recurse(parent[key], theirs[key], mine[key], path, options);
-    if(differences) {
-      results = results.concat(differences);
+      _.forOwn(array, function (value, key) {
+        if (!_.isArray(value) && !_.isObject(value)) {
+
+        } else {
+          // TODO handle arrays of arrays or objects
+        }
+      });
     }
-    path.pop();
+    else if (_.isObject(value)) {
+      path.push(key);
+      var differences = recurse(parent[key], theirs[key], mine[key], path, options[key] || {});
+      if (differences) {
+        results = results.concat(differences);
+      }
+      path.pop();
+    }
   }
 
   return results;
@@ -104,7 +107,7 @@ function compareValues(parent, theirs, mine, path, options) {
   }
   else if(_.isArray(parent) || _.isArray(mine) || _.isArray(theirs)) {
     // Maintain array order unless flagged as ignoreOrder
-    if (typeof options[path] != 'undefined' && options[path]['ignoreOrder']) {
+    if (!_.isUndefined(options) && options['ignoreOrder']) {
       parent = parent.sort();
       mine = mine.sort();
       theirs = theirs.sort();
@@ -175,20 +178,4 @@ function compareValues(parent, theirs, mine, path, options) {
   else {
     // All 3 are equal
   }
-}
-
-// From https://gist.github.com/tushariscoolster/567c1d22ca8d5498cbc0
-function traverse(obj) {
-  _.forIn(obj, function (val, key) {
-    if (_.isArray(val)) {
-      val.forEach(function(el) {
-        if (_.isObject(el)) {
-          traverse(el);
-        }
-      });
-    }
-    if (_.isObject(key)) {
-      traverse(obj[key]);
-    }
-  });
 }

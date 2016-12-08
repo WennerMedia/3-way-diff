@@ -189,6 +189,74 @@ describe('Literals Diff', function() {
     ];
     assert.deepEqual(diff(parent, theirs, mine), expected);
   });
+
+  it('both children edit same key to same values, ignore key', function() {
+    var parent = {
+      key: 'value',
+    };
+    var theirs = {
+      key: 'value1'
+    };
+    var mine = {
+      key: 'value1'
+    };
+    var expected = [
+      // No differences
+    ];
+    assert.deepEqual(diff(parent, theirs, mine, {key: {ignoreKey: true}}), expected);
+  });
+
+  it('both children edit same key to different values, ignore key', function() {
+    var parent = {
+      key: 'value'
+    };
+    var theirs = {
+      key: 'value1'
+    };
+    var mine = {
+      key: 'value2'
+    };
+    var expected = [
+      // No differences
+    ];
+    assert.deepEqual(diff(parent, theirs, mine, {key: {ignoreKey: true}}), expected);
+  });
+
+  it('both children edit different keys to different values, ignore keyIgnored', function() {
+    var parent = {
+      keyTheirs: 'value',
+      keyMine: 'value',
+      keyIgnored: 'value'
+    };
+    var theirs = {
+      keyTheirs: 'value1',
+      keyMine: 'value',
+      keyIgnored: 'value1'
+    };
+    var mine = {
+      keyTheirs: 'value',
+      keyMine: 'value1',
+      keyIgnored: 'value2'
+    };
+    var expected = [
+      // Conflict on keyTheirs, Edit on keyMine
+      {
+        kind: 'C',
+        path: [ 'keyTheirs' ],
+        parent: parent.keyTheirs,
+        theirs: theirs.keyTheirs,
+        mine: mine.keyTheirs
+      },
+      {
+        kind: 'E',
+        path: [ 'keyMine' ],
+        parent: parent.keyMine,
+        theirs: theirs.keyMine,
+        mine: mine.keyMine
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine, {keyIgnored: {ignoreKey: true}}), expected);
+  });
 });
 
 // TODO These are probably useful tests https://github.com/falsecz/3-way-merge/blob/master/test/test.coffee
