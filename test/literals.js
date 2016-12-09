@@ -257,6 +257,69 @@ describe('Literals Diff', function() {
     ];
     assert.deepEqual(diff(parent, theirs, mine, {keyIgnored: {ignoreKey: true}}), expected);
   });
+
+  it('no difference between objects, key1 & key2 flagged as falsy', function() {
+    var parent = {
+      key1: '',
+      key2: false
+    };
+    var theirs = {
+      key1: 0,
+      key2: NaN
+    };
+    var mine = {
+      key1: null
+      // key2 left undefined for test
+    };
+    var expected = [
+      // No differences
+    ];
+    assert.deepEqual(diff(parent, theirs, mine, {key1: {falsy: true}, key2: {falsy: true}}), expected);
+  });
+
+  it('mine edits key to non-falsy value, key flagged as falsy', function() {
+    var parent = {
+      key: '',
+    };
+    var theirs = {
+      key: 0,
+    };
+    var mine = {
+      key: 'value'
+    };
+    var expected = [
+      {
+        kind: 'E',
+        path: [ 'key' ],
+        parent: parent.key,
+        theirs: theirs.key,
+        mine: mine.key
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine, {key: {falsy: true}}), expected);
+  });
+
+  it('both children edit same key to different values (theirs to non-falsy, mine to falsy), key flagged as falsy', function() {
+    var parent = {
+      key: '',
+    };
+    var theirs = {
+      key: 'value',
+    };
+    var mine = {
+      key: 0
+    };
+    var expected = [
+      {
+        kind: 'C',
+        path: [ 'key' ],
+        parent: parent.key,
+        theirs: theirs.key,
+        mine: mine.key
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine, {key: {falsy: true}}), expected);
+  });
 });
 
 // TODO These are probably useful tests https://github.com/falsecz/3-way-merge/blob/master/test/test.coffee

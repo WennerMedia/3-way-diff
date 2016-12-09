@@ -142,7 +142,32 @@ function processKeyValuePair(key, value, parent, theirs, mine, path, options) {
  * @returns {*} - An object containing the conflict/edit, otherwise empty return
  */
 function compareValues(parent, theirs, mine, path, options) {
-  if(_.isUndefined(parent) && _.isUndefined(theirs) && !_.isUndefined(mine)) {
+  if (!_.isUndefined(options['falsy']) && options['falsy']) {
+    if (!parent && !theirs && !mine) {
+      // All are falsy, no conflict
+    }
+    else if (!parent && !theirs && mine) {
+      // parent/theirs are equal (falsy), mine is different: 'E'
+      return {
+        kind: 'E',
+        path: path.slice(),
+        parent: parent,
+        theirs: theirs,
+        mine: mine
+      };
+    }
+    else if (!parent && theirs && !mine) {
+      // parent/mine are equal (falsy), theirs is different: 'C'
+      return {
+        kind: 'C',
+        path: path.slice(),
+        parent: parent,
+        theirs: theirs,
+        mine: mine
+      };
+    }
+  }
+  else if(_.isUndefined(parent) && _.isUndefined(theirs) && !_.isUndefined(mine)) {
     // Mine is new: 'N'
     return {
       kind: 'N',

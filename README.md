@@ -67,3 +67,4 @@ Options:
 Flags
 * `ignoreKey` - Do not diff this key
 * `ignoreOrder` - Compares arrays without maintaining order
+* `falsy` - Allow values to be compared as falsy (0, '', false, undefined, NaN and null are equal)
