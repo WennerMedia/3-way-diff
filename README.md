@@ -21,7 +21,6 @@ Differences are reported as one or more change records. Change records have the 
     * `N` - indicates a newly added property/element
     * `D` - indicates a property/element was deleted
     * `E` - indicates a property/element was edited
-    * `A` - indicates a change occurred within an array
     * `C` - indicates a conflicting change was made to both mine and theirs
 * `path` - the property path (from the parent)
 * `parent` - the value on parent (undefined if kind === 'A')
