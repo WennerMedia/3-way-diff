@@ -112,6 +112,66 @@ describe('Array Diff', function() {
     ];
     assert.deepEqual(diff(parent, theirs, mine), expected);
   });
+
+  it('both children edit same key to same literal values', function() {
+    var parent = {
+      key: [1, 2, 3]
+    };
+    var theirs = {
+      key: 'value'
+    };
+    var mine = {
+      key: 'value'
+    };
+    var expected = [
+      // No differences
+    ];
+    assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
+
+  it('mine edits key to different literal value', function() {
+    var parent = {
+      key: [1, 2, 3]
+    };
+    var theirs = {
+      key: [1, 2, 3]
+    };
+    var mine = {
+      key: 'value'
+    };
+    var expected = [
+      {
+        kind: 'E',
+        path: [ 'key' ],
+        parent: parent.key,
+        theirs: theirs.key,
+        mine: mine.key
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
+
+  it('both children edit same key to different literal values', function() {
+    var parent = {
+      key: [1, 2, 3]
+    };
+    var theirs = {
+      key: 'value'
+    };
+    var mine = {
+      key: 'value1'
+    };
+    var expected = [
+      {
+        kind: 'C',
+        path: [ 'key' ],
+        parent: parent.key,
+        theirs: theirs.key,
+        mine: mine.key
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
 });
 
 // TODO These are probably useful tests https://github.com/falsecz/3-way-merge/blob/master/test/test.coffee
