@@ -23,11 +23,9 @@ Differences are reported as one or more change records. Change records have the 
     * `E` - indicates a property/element was edited
     * `C` - indicates a conflicting change was made to both mine and theirs
 * `path` - the property path (from the parent)
-* `parent` - the value on parent (undefined if kind === 'A')
+* `parent` - the value on parent
 * `theirs` - the value on theirs (undefined if kind === 'N')
 * `mine` - the value on mine (undefined if kind === 'D')
-* `index` - when kind === 'A', indicates the array index where the change occurred
-* `item` - when kind === 'A', contains a nested change record indicating the change that occurred at the array index
 
 ### Options
 Options object can be used to denote certain flags.  Object should be replica of `mine` with flags set on specific keys
