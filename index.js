@@ -50,7 +50,7 @@ module.exports = function(parent, theirs, mine, options = {}) {
  * @param {object} options - Key specific options for diff
  * @returns {Array} - Array of objects specifying the differences
  */
-function recurse(parent, theirs, mine, path = [], options) {
+function recurse(parent, theirs, mine, path = [], options = {}) {
   var results = [];
 
   // Handle all the keys that exist in mine
