@@ -17,14 +17,12 @@ var _ = require('lodash');
  * 3-way-diff Constructor
  *
  * @param {object} parent - Object with parent values
- * @param {object} theirs - Object with their changes
- * @param {object} mine - Object with my changes
+ * @param {object} theirs - Object with their values
+ * @param {object} mine - Object with my values
  * @param {object} options - Key specific options for diff
  * @returns {Array} - Array of objects specifying the differences
  */
-module.exports = function(parent, theirs, mine, options) {
-  options = options || {};
-
+module.exports = function(parent, theirs, mine, options = {}) {
   if(!_.isPlainObject(parent)) {
     throw new Error('Parent must be an object');
   }
@@ -46,14 +44,13 @@ module.exports = function(parent, theirs, mine, options) {
  * Recursively traverse the objects to handle 3-way-diff
  *
  * @param {object} parent - Object with parent values
- * @param {object} theirs - Object with their changes
- * @param {object} mine - Object with my changes
+ * @param {object} theirs - Object with their values
+ * @param {object} mine - Object with my values
  * @param {array} path - Path to value in parent/theirs/mine
  * @param {object} options - Key specific options for diff
  * @returns {Array} - Array of objects specifying the differences
  */
-function recurse(parent, theirs, mine, path, options) {
-  var path = path || [];
+function recurse(parent, theirs, mine, path = [], options) {
   var results = [];
 
   // Handle all the keys that exist in mine
@@ -69,6 +66,13 @@ function recurse(parent, theirs, mine, path, options) {
     }
   });
 
+  // Handle all the keys that exist in theirs but not parent/mine
+  _.forOwn(theirs, function(value, key) {
+    if (_.isUndefined(mine[key]) && _.isUndefined(parent[key])) {
+      results = results.concat(processKeyValuePair(key, value, parent, theirs, mine, path, options));
+    }
+  });
+
   return results;
 }
 
@@ -78,49 +82,47 @@ function recurse(parent, theirs, mine, path, options) {
  * @param key - The current object key to dif
  * @param value - The current object value to diff
  * @param {object} parent - Object with parent values
- * @param {object} theirs - Object with their changes
- * @param {object} mine - Object with my changes
+ * @param {object} theirs - Object with their values
+ * @param {object} mine - Object with my values
  * @param {array} path - Path to value in parent/theirs/mine
  * @param {object} options - Key specific options for diff
  * @returns {Array} - Array of objects specifying the differences
  */
-function processKeyValuePair(key, value, parent, theirs, mine, path, options) {
+function processKeyValuePair(key, value, parent, theirs, mine, path, options = {}) {
   var results = [];
 
   // Only process keys that have no options, or have not been flagged as ignored
   if (_.isUndefined(options[key]) || (!_.isUndefined(options[key]) && !options[key]['ignoreKey'])) {
-    if (!_.isArray(value) && !_.isObject(value)) {
+    if (_.isArray(value)) {
+      var array = value;
+      var literalValues = value.filter(function (i) {
+        return !_.isArray(i) && !_.isObject(i);
+      });
+      // If single dimension array run the comparison
+      if (literalValues.length == value.length) {
+        path.push(key);
+        var differences = compareValues(parent[key], theirs[key], mine[key], path, options[key]);
+        if (differences) {
+          results = results.concat(differences);
+        }
+        path.pop(key);
+      } else {
+        _.forOwn(array, function (value, key) {
+          // TODO handle arrays of arrays or objects
+        });
+      }
+    }
+    else if (_.isObject(value)) {
       path.push(key);
-      var differences = compareValues(parent[key], theirs[key], mine[key], path, options[key] || {});
+      var differences = recurse(parent[key], theirs[key], mine[key], path, options[key]);
       if (differences) {
         results = results.concat(differences);
       }
       path.pop();
     }
-    else if (_.isArray(value)) {
-      var array = value;
-      // If single dimension array run the comparison
-      if (value.filter(function (i) {
-          return !_.isArray(i) && !_.isObject(i);
-        }).length == value.length) {
-        path.push(key);
-        var differences = compareValues(parent[key], theirs[key], mine[key], path, options[key] || {});
-        if (differences) {
-          results = results.concat(differences);
-        }
-        path.pop(key);
-      }
-      _.forOwn(array, function (value, key) {
-        if (!_.isArray(value) && !_.isObject(value)) {
-
-        } else {
-          // TODO handle arrays of arrays or objects
-        }
-      });
-    }
-    else if (_.isObject(value)) {
+    else {
       path.push(key);
-      var differences = recurse(parent[key], theirs[key], mine[key], path, options[key] || {});
+      var differences = compareValues(parent[key], theirs[key], mine[key], path, options[key]);
       if (differences) {
         results = results.concat(differences);
       }
@@ -135,16 +137,17 @@ function processKeyValuePair(key, value, parent, theirs, mine, path, options) {
  * Compare the values in parent/theirs/mine to determine type of conflict/edit (if any)
  *
  * @param {object} parent - Object with parent values
- * @param {object} theirs - Object with their changes
- * @param {object} mine - Object with my changes
+ * @param {object} theirs - Object with their values
+ * @param {object} mine - Object with my values
  * @param {array} path - Path to value in parent/theirs/mine
  * @param {object} options - Key specific options for diff
- * @returns {*} - An object containing the conflict/edit, otherwise empty return
+ * @returns {object|null} - An object containing the conflict/edit, otherwise empty return
  */
-function compareValues(parent, theirs, mine, path, options) {
+function compareValues(parent, theirs, mine, path, options = {}) {
   if (!_.isUndefined(options['falsy']) && options['falsy']) {
     if (!parent && !theirs && !mine) {
       // All are falsy, no conflict
+      return;
     }
     else if (!parent && !theirs && mine) {
       // parent/theirs are equal (falsy), mine is different: 'E'
@@ -187,9 +190,9 @@ function compareValues(parent, theirs, mine, path, options) {
   else if(_.isArray(parent) || _.isArray(mine) || _.isArray(theirs)) {
     // Maintain array order unless flagged as ignoreOrder
     if (!_.isUndefined(options) && options['ignoreOrder']) {
-      parent = parent.sort();
-      mine = mine.sort();
-      theirs = theirs.sort();
+      parent = _.isArray(parent) ? parent.sort() : parent;
+      mine = _.isArray(mine) ? mine.sort() : mine;
+      theirs = _.isArray(theirs) ? theirs.sort() : theirs;
     }
     if (!_.isEqual(parent, theirs) && !_.isEqual(parent, mine) && !_.isEqual(theirs, mine)) {
       // All 3 are different: 'C'
@@ -222,6 +225,7 @@ function compareValues(parent, theirs, mine, path, options) {
       };
     } else {
       // All 3 are equal
+      return;
     }
   }
   else if(parent !== theirs && parent !== mine && theirs !== mine) {
@@ -256,5 +260,6 @@ function compareValues(parent, theirs, mine, path, options) {
   }
   else {
     // All 3 are equal
+    return;
   }
 }
