@@ -6,6 +6,4 @@ cache:
     - node_modules
 notifications:
   email: false
-  slack:
-    rooms:
-      secure: $SLACK_SECURE
+  slack: $SLACK_SECURE
