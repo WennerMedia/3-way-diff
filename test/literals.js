@@ -1,7 +1,7 @@
 var assert = require('assert');
 var diff = require('../index.js');
 
-describe('Diff', function() {
+describe('Literals Diff', function() {
   it('parent is not an object', function() {
     assert.throws(function() { diff('', {}, {}); }, /Parent must be an object/);
   });
@@ -118,9 +118,31 @@ describe('Diff', function() {
     assert.deepEqual(diff(parent, theirs, mine), expected);
   });
 
+  it('theirs edits key that doesn\'t exist in parent/mine', function() {
+    var parent = {
+
+    };
+    var theirs = {
+      missingKey: 'value'
+    };
+    var mine = {
+
+    };
+    var expected = [
+      {
+        kind: 'C',
+        path: [ 'missingKey' ],
+        parent: parent.missingKey,
+        theirs: theirs.missingKey,
+        mine: mine.missingKey
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
+
   it('both children edit same key to same values', function() {
     var parent = {
-      key: 'value'
+      key: 'value',
     };
     var theirs = {
       key: 'value1'
@@ -188,6 +210,137 @@ describe('Diff', function() {
       }
     ];
     assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
+
+  it('both children edit same key to same values, ignore key', function() {
+    var parent = {
+      key: 'value',
+    };
+    var theirs = {
+      key: 'value1'
+    };
+    var mine = {
+      key: 'value1'
+    };
+    var expected = [
+      // No differences
+    ];
+    assert.deepEqual(diff(parent, theirs, mine, {key: {ignoreKey: true}}), expected);
+  });
+
+  it('both children edit same key to different values, ignore key', function() {
+    var parent = {
+      key: 'value'
+    };
+    var theirs = {
+      key: 'value1'
+    };
+    var mine = {
+      key: 'value2'
+    };
+    var expected = [
+      // No differences
+    ];
+    assert.deepEqual(diff(parent, theirs, mine, {key: {ignoreKey: true}}), expected);
+  });
+
+  it('both children edit different keys to different values, ignore keyIgnored', function() {
+    var parent = {
+      keyTheirs: 'value',
+      keyMine: 'value',
+      keyIgnored: 'value'
+    };
+    var theirs = {
+      keyTheirs: 'value1',
+      keyMine: 'value',
+      keyIgnored: 'value1'
+    };
+    var mine = {
+      keyTheirs: 'value',
+      keyMine: 'value1',
+      keyIgnored: 'value2'
+    };
+    var expected = [
+      // Conflict on keyTheirs, Edit on keyMine
+      {
+        kind: 'C',
+        path: [ 'keyTheirs' ],
+        parent: parent.keyTheirs,
+        theirs: theirs.keyTheirs,
+        mine: mine.keyTheirs
+      },
+      {
+        kind: 'E',
+        path: [ 'keyMine' ],
+        parent: parent.keyMine,
+        theirs: theirs.keyMine,
+        mine: mine.keyMine
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine, {keyIgnored: {ignoreKey: true}}), expected);
+  });
+
+  it('no difference between objects, key1 & key2 flagged as falsy', function() {
+    var parent = {
+      key1: '',
+      key2: false
+    };
+    var theirs = {
+      key1: 0,
+      key2: NaN
+    };
+    var mine = {
+      key1: null
+      // key2 left undefined for test
+    };
+    var expected = [
+      // No differences
+    ];
+    assert.deepEqual(diff(parent, theirs, mine, {key1: {falsy: true}, key2: {falsy: true}}), expected);
+  });
+
+  it('mine edits key to non-falsy value, key flagged as falsy', function() {
+    var parent = {
+      key: '',
+    };
+    var theirs = {
+      key: 0,
+    };
+    var mine = {
+      key: 'value'
+    };
+    var expected = [
+      {
+        kind: 'E',
+        path: [ 'key' ],
+        parent: parent.key,
+        theirs: theirs.key,
+        mine: mine.key
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine, {key: {falsy: true}}), expected);
+  });
+
+  it('both children edit same key to different values (theirs to non-falsy, mine to falsy), key flagged as falsy', function() {
+    var parent = {
+      key: '',
+    };
+    var theirs = {
+      key: 'value',
+    };
+    var mine = {
+      key: 0
+    };
+    var expected = [
+      {
+        kind: 'C',
+        path: [ 'key' ],
+        parent: parent.key,
+        theirs: theirs.key,
+        mine: mine.key
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine, {key: {falsy: true}}), expected);
   });
 });
 
