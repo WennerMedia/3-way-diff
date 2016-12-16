@@ -9,8 +9,6 @@ Structure of return object is loosely based on https://github.com/flitbit/diff
 
 Some comparison is based on https://github.com/falsecz/3-way-merge/blob/master/test/test.coffee
 
-// TODO Allow prefiltering to ignore certain fields
-
 Concestor comes from https://github.com/dominictarr/xdiff
 
 ### Differences
