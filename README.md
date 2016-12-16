@@ -1,3 +1,7 @@
+# 3-way-diff
+
+[![Build Status](https://travis-ci.org/WennerMedia/3-way-diff.svg?branch=master)](https://travis-ci.org/WennerMedia/3-way-diff)
+
 https://github.com/lodash/lodash/blob/master/lodash.js#L11220
 **Note:** This method supports comparing arrays, array buffers, booleans,
     date objects, error objects, maps, numbers, `Object` objects, regexes,
