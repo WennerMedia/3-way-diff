@@ -2,7 +2,7 @@ var assert = require('assert');
 var diff = require('../index.js');
 
 describe('Array Diff', function() {
-  it('both children edit same key to same array values', function() {
+  it('no differences between the objects', function() {
     var parent = {
       key: [1, 2, 3]
     };
@@ -168,6 +168,28 @@ describe('Array Diff', function() {
         parent: parent.key,
         theirs: theirs.key,
         mine: mine.key
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
+
+  it('theirs edits key that doesn\'t exist in parent/mine', function() {
+    var parent = {
+
+    };
+    var theirs = {
+      missingKey: [1, 2, 3]
+    };
+    var mine = {
+
+    };
+    var expected = [
+      {
+        kind: 'C',
+        path: [ 'missingKey' ],
+        parent: parent.missingKey,
+        theirs: theirs.missingKey,
+        mine: mine.missingKey
       }
     ];
     assert.deepEqual(diff(parent, theirs, mine), expected);

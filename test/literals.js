@@ -118,6 +118,28 @@ describe('Literals Diff', function() {
     assert.deepEqual(diff(parent, theirs, mine), expected);
   });
 
+  it('theirs edits key that doesn\'t exist in parent/mine', function() {
+    var parent = {
+
+    };
+    var theirs = {
+      missingKey: 'value'
+    };
+    var mine = {
+
+    };
+    var expected = [
+      {
+        kind: 'C',
+        path: [ 'missingKey' ],
+        parent: parent.missingKey,
+        theirs: theirs.missingKey,
+        mine: mine.missingKey
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
+
   it('both children edit same key to same values', function() {
     var parent = {
       key: 'value',
