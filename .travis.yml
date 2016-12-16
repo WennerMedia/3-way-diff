@@ -8,4 +8,4 @@ notifications:
   email: false
   slack:
     rooms:
-      - $SLACK_SECURE
+      - ${SLACK_SECURE}
