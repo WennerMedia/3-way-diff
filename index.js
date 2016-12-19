@@ -22,7 +22,9 @@ var _ = require('lodash');
  * @param {object} options - Key specific options for diff
  * @returns {Array} - Array of objects specifying the differences
  */
-module.exports = function(parent, theirs, mine, options = {}) {
+module.exports = function(parent, theirs, mine, options) {
+  options = options || {};
+
   if(!_.isPlainObject(parent)) {
     throw new Error('Parent must be an object');
   }
@@ -50,7 +52,9 @@ module.exports = function(parent, theirs, mine, options = {}) {
  * @param {object} options - Key specific options for diff
  * @returns {Array} - Array of objects specifying the differences
  */
-function recurse(parent, theirs, mine, path = [], options = {}) {
+function recurse(parent, theirs, mine, path, options) {
+  path = path || [];
+  options = options || {};
   var results = [];
 
   // Handle all the keys that exist in mine
@@ -88,7 +92,8 @@ function recurse(parent, theirs, mine, path = [], options = {}) {
  * @param {object} options - Key specific options for diff
  * @returns {Array} - Array of objects specifying the differences
  */
-function processKeyValuePair(key, value, parent, theirs, mine, path, options = {}) {
+function processKeyValuePair(key, value, parent, theirs, mine, path, options) {
+  options = options || {};
   var results = [];
 
   // Only process keys that have no options, or have not been flagged as ignored
@@ -101,7 +106,7 @@ function processKeyValuePair(key, value, parent, theirs, mine, path, options = {
       // If single dimension array run the comparison
       if (literalValues.length == value.length) {
         path.push(key);
-        var differences = compareValues(parent[key], theirs[key], mine[key], path, options[key]);
+        var differences = compareValues(parent[key], theirs[key], mine[key], path, options[key] || {});
         if (differences) {
           results = results.concat(differences);
         }
@@ -114,7 +119,7 @@ function processKeyValuePair(key, value, parent, theirs, mine, path, options = {
     }
     else if (_.isObject(value)) {
       path.push(key);
-      var differences = recurse(parent[key], theirs[key], mine[key], path, options[key]);
+      var differences = recurse(parent[key], theirs[key], mine[key], path, options[key] || {});
       if (differences) {
         results = results.concat(differences);
       }
@@ -122,7 +127,7 @@ function processKeyValuePair(key, value, parent, theirs, mine, path, options = {
     }
     else {
       path.push(key);
-      var differences = compareValues(parent[key], theirs[key], mine[key], path, options[key]);
+      var differences = compareValues(parent[key], theirs[key], mine[key], path, options[key] || {});
       if (differences) {
         results = results.concat(differences);
       }
@@ -143,7 +148,9 @@ function processKeyValuePair(key, value, parent, theirs, mine, path, options = {
  * @param {object} options - Key specific options for diff
  * @returns {object|null} - An object containing the conflict/edit, otherwise empty return
  */
-function compareValues(parent, theirs, mine, path, options = {}) {
+function compareValues(parent, theirs, mine, path, options) {
+  options = options || {};
+
   if (!_.isUndefined(options['falsy']) && options['falsy']) {
     if (!parent && !theirs && !mine) {
       // All are falsy, no conflict
