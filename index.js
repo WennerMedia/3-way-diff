@@ -54,6 +54,7 @@ module.exports = function(parent, theirs, mine, options) {
  */
 function recurse(parent, theirs, mine, path, options) {
   path = path || [];
+  options = options || {};
   var results = [];
 
   // Handle all the keys that exist in mine
@@ -92,6 +93,7 @@ function recurse(parent, theirs, mine, path, options) {
  * @returns {Array} - Array of objects specifying the differences
  */
 function processKeyValuePair(key, value, parent, theirs, mine, path, options) {
+  options = options || {};
   var results = [];
 
   // Only process keys that have no options, or have not been flagged as ignored
@@ -147,6 +149,8 @@ function processKeyValuePair(key, value, parent, theirs, mine, path, options) {
  * @returns {object|null} - An object containing the conflict/edit, otherwise empty return
  */
 function compareValues(parent, theirs, mine, path, options) {
+  options = options || {};
+
   if (!_.isUndefined(options['falsy']) && options['falsy']) {
     if (!parent && !theirs && !mine) {
       // All are falsy, no conflict
