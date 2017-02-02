@@ -106,7 +106,7 @@ function processKeyValuePair(key, value, parent, theirs, mine, path, options) {
       // If single dimension array run the comparison
       if (literalValues.length == value.length) {
         path.push(key);
-        var differences = compareValues(parent[key], theirs[key], mine[key], path, options[key] || {});
+        var differences = compareValues(parent[key] || {}, theirs[key] || {}, mine[key] || {}, path, options[key] || {});
         if (differences) {
           results = results.concat(differences);
         }
@@ -119,7 +119,7 @@ function processKeyValuePair(key, value, parent, theirs, mine, path, options) {
     }
     else if (_.isObject(value)) {
       path.push(key);
-      var differences = recurse(parent[key], theirs[key], mine[key], path, options[key] || {});
+      var differences = recurse(parent[key] || {}, theirs[key] || {}, mine[key] || {}, path, options[key] || {});
       if (differences) {
         results = results.concat(differences);
       }
@@ -127,7 +127,7 @@ function processKeyValuePair(key, value, parent, theirs, mine, path, options) {
     }
     else {
       path.push(key);
-      var differences = compareValues(parent[key], theirs[key], mine[key], path, options[key] || {});
+      var differences = compareValues(parent[key] || {}, theirs[key] || {}, mine[key] || {}, path, options[key] || {});
       if (differences) {
         results = results.concat(differences);
       }
