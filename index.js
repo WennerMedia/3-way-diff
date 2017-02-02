@@ -65,14 +65,14 @@ function recurse(parent, theirs, mine, path, options) {
   // Handle all the keys that exist in parent but not mine
   _.forOwn(parent, function(value, key) {
     // Skip all keys that exist in mine
-    if (_.isUndefined(mine[key])) {
+    if (_.isUndefined(mine) || (mine && _.isUndefined(mine[key]))) {
       results = results.concat(processKeyValuePair(key, value, parent, theirs, mine, path, options));
     }
   });
 
   // Handle all the keys that exist in theirs but not parent/mine
   _.forOwn(theirs, function(value, key) {
-    if (_.isUndefined(mine[key]) && _.isUndefined(parent[key])) {
+    if ((_.isUndefined(mine) || (mine && _.isUndefined(mine[key]))) && (_.isUndefined(parent) || (parent && _.isUndefined(parent[key])))) {
       results = results.concat(processKeyValuePair(key, value, parent, theirs, mine, path, options));
     }
   });
@@ -94,6 +94,9 @@ function recurse(parent, theirs, mine, path, options) {
  */
 function processKeyValuePair(key, value, parent, theirs, mine, path, options) {
   options = options || {};
+  var parentValue = typeof parent !== 'undefined' ? parent[key] : undefined;
+  var theirsValue = typeof theirs !== 'undefined' ? theirs[key] : undefined;
+  var mineValue = typeof mine !== 'undefined' ? mine[key] : undefined;
   var results = [];
 
   // Only process keys that have no options, or have not been flagged as ignored
@@ -106,7 +109,7 @@ function processKeyValuePair(key, value, parent, theirs, mine, path, options) {
       // If single dimension array run the comparison
       if (literalValues.length == value.length) {
         path.push(key);
-        var differences = compareValues(parent[key], theirs[key], mine[key], path, options[key] || {});
+        var differences = compareValues(parentValue, theirsValue, mineValue, path, options[key] || {});
         if (differences) {
           results = results.concat(differences);
         }
@@ -119,7 +122,7 @@ function processKeyValuePair(key, value, parent, theirs, mine, path, options) {
     }
     else if (_.isObject(value)) {
       path.push(key);
-      var differences = recurse(parent[key], theirs[key], mine[key], path, options[key] || {});
+      var differences = recurse(parentValue, theirsValue, mineValue, path, options[key] || {});
       if (differences) {
         results = results.concat(differences);
       }
@@ -127,7 +130,7 @@ function processKeyValuePair(key, value, parent, theirs, mine, path, options) {
     }
     else {
       path.push(key);
-      var differences = compareValues(parent[key], theirs[key], mine[key], path, options[key] || {});
+      var differences = compareValues(parentValue, theirsValue, mineValue, path, options[key] || {});
       if (differences) {
         results = results.concat(differences);
       }
