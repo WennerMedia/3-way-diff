@@ -432,7 +432,6 @@ describe('Literals Diff', function() {
       }
     };
     var expected = [
-      // Conflict on key modified in both theirs/mine
       {
         kind: 'N',
         path: [ 'key', 'childKey1', 'subChildKey'],
