@@ -342,6 +342,130 @@ describe('Literals Diff', function() {
     ];
     assert.deepEqual(diff(parent, theirs, mine, {key: {falsy: true}}), expected);
   });
+
+  it('both children edit same nested key to different values', function() {
+    var parent = {
+      key: {
+        childKey: 'value',
+        childKey1: {
+          subchildKey: 'value'
+        }
+      }
+    };
+    var theirs = {
+      key: {
+        childKey: 'value1',
+        childKey1: {
+          subchildKey: 'value'
+        }
+      }
+    };
+    var mine = {
+      key: {
+        childKey: 'value2',
+        childKey1: {
+          subchildKey: 'value'
+        }
+      }
+    };
+    var expected = [
+      // Conflict on key modified in both theirs/mine
+      {
+        kind: 'C',
+        path: [ 'key', 'childKey' ],
+        parent: parent.key.childKey,
+        theirs: theirs.key.childKey,
+        mine: mine.key.childKey
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
+
+  it('both children edit different nested keys to different values, ignore key', function() {
+    var parent = {
+      keyIgnored: {
+        childKey: 'value',
+        childKey1: {
+          subchildKey: 'value'
+        }
+      }
+    };
+    var theirs = {
+      keyIgnored: {
+        childKey: 'value',
+        childKey1: {
+          subchildKey: 'value1'
+        }
+      }
+    };
+    var mine = {
+      keyIgnored: {
+        childKey: 'value',
+        childKey1: {
+          subchildKey: 'value2'
+        }
+      }
+    };
+    var expected = [
+      // No differences
+    ];
+    assert.deepEqual(diff(parent, theirs, mine, {keyIgnored: {ignoreKey: true}}), expected);
+  });
+
+  it('mine adds nested key that does not exist in parent/theirs', function() {
+    var parent = {
+      key: {
+        childKey: 'value'
+      }
+    };
+    var theirs = {
+      key: {
+        childKey: 'value'
+      }
+    };
+    var mine = {
+      key: {
+        childKey: 'value',
+        childKey1: {
+          subChildKey: 'value1'
+        }
+      }
+    };
+    var expected = [
+      // Conflict on key modified in both theirs/mine
+      {
+        kind: 'N',
+        path: [ 'key', 'childKey1', 'subChildKey'],
+        mine: mine.key.childKey1.subChildKey
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
+
+  it('mine adds nested key that does not exist in parent/theirs, ignore key', function() {
+    var parent = {
+      keyIgnored: {
+        childKey: 'value'
+      }
+    };
+    var theirs = {
+      keyIgnored: {
+        childKey: 'value'
+      }
+    };
+    var mine = {
+      keyIgnored: {
+        childKey: 'value',
+        childKey1: {
+          subchildKey: 'value1'
+        }
+      }
+    };
+    var expected = [
+      // No differences
+    ];
+    assert.deepEqual(diff(parent, theirs, mine, {keyIgnored: {ignoreKey: true}}), expected);
+  });
 });
 
 // TODO These are probably useful tests https://github.com/falsecz/3-way-merge/blob/master/test/test.coffee
