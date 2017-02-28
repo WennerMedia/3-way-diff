@@ -194,6 +194,62 @@ describe('Array Diff', function() {
     ];
     assert.deepEqual(diff(parent, theirs, mine), expected);
   });
+
+  it('both children edit same array item to same array values', function() {
+    var parent = {
+      key: [
+        {childKey1: 'value1'},
+        {childKey2: 'value2'}
+      ]
+    };
+    var theirs = {
+      key: [
+        {childKey1: 'value3'},
+        {childKey2: 'value2'}
+      ]
+    };
+    var mine = {
+      key: [
+        {childKey1: 'value3'},
+        {childKey2: 'value2'}
+      ]
+    };
+    var expected = [
+      // No differences
+    ];
+    assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
+
+  it('both children edit same array item to different array values', function() {
+    var parent = {
+      key: [
+        {childKey1: 'value1'},
+        {childKey2: 'value2'}
+      ]
+    };
+    var theirs = {
+      key: [
+        {childKey1: 'value3'},
+        {childKey2: 'value2'}
+      ]
+    };
+    var mine = {
+      key: [
+        {childKey1: 'value4'},
+        {childKey2: 'value2'}
+      ]
+    };
+    var expected = [
+      {
+        kind: 'C',
+        path: [ 'key', '0', 'childKey1' ],
+        parent: parent.key[0].childKey1,
+        theirs: theirs.key[0].childKey1,
+        mine: mine.key[0].childKey1
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
 });
 
 // TODO These are probably useful tests https://github.com/falsecz/3-way-merge/blob/master/test/test.coffee
