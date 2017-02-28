@@ -115,9 +115,17 @@ function processKeyValuePair(key, value, parent, theirs, mine, path, options) {
         }
         path.pop(key);
       } else {
-        _.forOwn(array, function (value, key) {
-          // TODO handle arrays of arrays or objects
-        });
+        // Handle arrays
+        path.push(key);
+        for (var index in array) {
+          path.push(index);
+          var differences = recurse(parentValue[index], theirsValue[index], mineValue[index], path, options[key] || {});
+          if (differences) {
+            results = results.concat(differences);
+          }
+          path.pop();
+        }
+        path.pop();
       }
     }
     else if (_.isObject(value)) {
