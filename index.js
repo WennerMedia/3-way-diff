@@ -94,9 +94,9 @@ function recurse(parent, theirs, mine, path, options) {
  */
 function processKeyValuePair(key, value, parent, theirs, mine, path, options) {
   options = options || {};
-  var parentValue = typeof parent !== 'undefined' ? parent[key] : undefined;
-  var theirsValue = typeof theirs !== 'undefined' ? theirs[key] : undefined;
-  var mineValue = typeof mine !== 'undefined' ? mine[key] : undefined;
+  var parentValue = typeof parent !== 'undefined' ? (parent !== null ? parent[key] : parent ) : undefined;
+  var theirsValue = typeof theirs !== 'undefined' ? (theirs !== null ? theirs[key] : theirs ) : undefined;
+  var mineValue = typeof mine !== 'undefined' ? (mine !== null ? mine[key] : mine ) : undefined;
   var results = [];
 
   // Only process keys that have no options, or have not been flagged as ignored
