@@ -480,10 +480,8 @@ describe('Literals Diff', function() {
     };
     var expected = [
       {
-        kind: 'E',
+        kind: 'N',
         path: [ 'key', 'childKey'],
-        parent: parent.key,
-        theirs: parent.key,
         mine: mine.key.childKey
       }
     ];
