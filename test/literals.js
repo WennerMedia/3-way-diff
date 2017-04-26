@@ -465,6 +465,74 @@ describe('Literals Diff', function() {
     ];
     assert.deepEqual(diff(parent, theirs, mine, {keyIgnored: {ignoreKey: true}}), expected);
   });
+
+  it('mine add nested childKey where the parent key is null', function() {
+    var parent = {
+      key: null
+    };
+    var theirs = {
+      key: null
+    };
+    var mine = {
+      key: {
+        childKey: 'value',
+      }
+    };
+    var expected = [
+      {
+        kind: 'N',
+        path: [ 'key', 'childKey'],
+        mine: mine.key.childKey
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
+
+  it('mine/theirs add nested childKey where the parent key is null', function() {
+    var parent = {
+      key: null
+    };
+    var theirs = {
+      key: {
+        childKey: 'value'
+      }
+    };
+    var mine = {
+      key: {
+        childKey: 'value',
+      }
+    };
+    var expected = [
+      // No differences
+    ];
+    assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
+
+  it('mine/theirs add nested childKey with different values where the parent key is null', function() {
+    var parent = {
+      key: null
+    };
+    var theirs = {
+      key: {
+        childKey: 'value1'
+      }
+    };
+    var mine = {
+      key: {
+        childKey: 'value2',
+      }
+    };
+    var expected = [
+      {
+        kind: 'C',
+        path: [ 'key', 'childKey'],
+        parent: parent.key,
+        theirs: theirs.key.childKey,
+        mine: mine.key.childKey
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
 });
 
 // TODO These are probably useful tests https://github.com/falsecz/3-way-merge/blob/master/test/test.coffee
