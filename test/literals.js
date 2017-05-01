@@ -434,8 +434,8 @@ describe('Literals Diff', function() {
     var expected = [
       {
         kind: 'N',
-        path: [ 'key', 'childKey1', 'subChildKey'],
-        mine: mine.key.childKey1.subChildKey
+        path: [ 'key', 'childKey1'],
+        mine: mine.key.childKey1
       }
     ];
     assert.deepEqual(diff(parent, theirs, mine), expected);
@@ -466,7 +466,27 @@ describe('Literals Diff', function() {
     assert.deepEqual(diff(parent, theirs, mine, {keyIgnored: {ignoreKey: true}}), expected);
   });
 
-  it('mine add nested childKey where the parent key is null', function() {
+  it('mine add nested childKey where the parent is empty', function() {
+    var parent = {
+    };
+    var theirs = {
+    };
+    var mine = {
+      key: {
+        childKey: 'value',
+      }
+    };
+    var expected = [
+      {
+        kind: 'N',
+        path: [ 'key'],
+        mine: mine.key
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
+
+  it('mine add nested childKey where the parent/theirs key are null', function() {
     var parent = {
       key: null
     };
