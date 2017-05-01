@@ -468,8 +468,10 @@ describe('Literals Diff', function() {
 
   it('mine add nested childKey where the parent is empty', function() {
     var parent = {
+
     };
     var theirs = {
+
     };
     var mine = {
       key: {
@@ -503,6 +505,52 @@ describe('Literals Diff', function() {
         kind: 'N',
         path: [ 'key', 'childKey'],
         mine: mine.key.childKey
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
+
+  it('mine/theirs add nested childKey where the parent key is null', function() {
+    var parent = {
+      key: null
+    };
+    var theirs = {
+      key: {
+        childKey: 'value',
+      }
+    };
+    var mine = {
+      key: {
+        childKey: 'value',
+      }
+    };
+    var expected = [
+      // No differences
+    ];
+    assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
+
+  it('mine/theirs add nested childKey with different values where the parent key is null', function() {
+    var parent = {
+      key: null
+    };
+    var theirs = {
+      key: {
+        childKey: 'value',
+      }
+    };
+    var mine = {
+      key: {
+        childKey: 'value1',
+      }
+    };
+    var expected = [
+      {
+        kind: 'C',
+        path: [ 'key', 'childKey'],
+        mine: mine.key.childKey,
+        theirs: theirs.key.childKey,
+        parent: parent.key
       }
     ];
     assert.deepEqual(diff(parent, theirs, mine), expected);

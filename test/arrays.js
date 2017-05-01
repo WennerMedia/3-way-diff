@@ -250,6 +250,53 @@ describe('Array Diff', function() {
     ];
     assert.deepEqual(diff(parent, theirs, mine), expected);
   });
+
+  it('mine edits item to different type', function() {
+    var parent = {
+      key: [
+        {childKey1: 'value1'},
+        {childKey2: 'value2'}
+      ]
+    };
+    var theirs = {
+      key: [
+        {childKey1: 'value3'},
+        {childKey2: 'value2'}
+      ]
+    };
+    var mine = {
+      key: {
+        childKey1: 'value4',
+        childKey2: 'value2'
+      }
+    };
+    var expected = [
+      {
+        kind: 'N',
+        path: [ 'key', 'childKey1'],
+        mine: mine.key.childKey1
+      },
+      {
+        kind: 'N',
+        path: [ 'key', 'childKey2'],
+        mine: mine.key.childKey2
+      },
+      {
+        kind: 'D',
+        path: [ 'key', 0],
+        parent: parent.key[0],
+        theirs: theirs.key[0]
+      }
+      ,
+      {
+        kind: 'D',
+        path: [ 'key', 1],
+        parent: parent.key[1],
+        theirs: theirs.key[1]
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
 });
 
 // TODO These are probably useful tests https://github.com/falsecz/3-way-merge/blob/master/test/test.coffee
