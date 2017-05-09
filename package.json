@@ -1,6 +1,6 @@
 {
   "name": "3-way-diff",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "3-way diffing of JavaScript objects",
   "main": "index.js",
   "repository": "WennerMedia/3-way-diff",
