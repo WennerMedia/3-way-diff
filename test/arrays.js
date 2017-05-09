@@ -286,8 +286,7 @@ describe('Array Diff', function() {
         path: [ 'key', 0],
         parent: parent.key[0],
         theirs: theirs.key[0]
-      }
-      ,
+      },
       {
         kind: 'D',
         path: [ 'key', 1],

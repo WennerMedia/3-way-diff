@@ -601,6 +601,81 @@ describe('Literals Diff', function() {
     ];
     assert.deepEqual(diff(parent, theirs, mine), expected);
   });
+
+  it('mine/theirs add nested childKey with same values that doesn\'t exist in the parent', function() {
+    var parent = {
+      key1: 'value'
+    };
+    var theirs = {
+      key1: 'value',
+      key2: {
+        childKey1: 'value'
+      }
+    };
+    var mine = {
+      key1: 'value',
+      key2: {
+        childKey1: 'value'
+      }
+    };
+    var expected = [
+      // No differences
+    ];
+    assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
+
+  it('mine/theirs add nested childKey with different values that doesn\'t exist in the parent', function() {
+    var parent = {
+      key1: 'value'
+    };
+    var theirs = {
+      key1: 'value',
+      key2: {
+        childKey1: 'value'
+      }
+    };
+    var mine = {
+      key1: 'value',
+      key2: {
+        childKey1: 'value1'
+      }
+    };
+    var expected = [
+      {
+        kind: 'C',
+        path: [ 'key2', 'childKey1'],
+        parent: parent.key2,
+        theirs: theirs.key2.childKey1,
+        mine: mine.key2.childKey1
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
+
+  it('theirs added a nested childKey that doesn\'t exist in parent/mine', function() {
+    var parent = {
+      key1: 'value'
+    };
+    var theirs = {
+      key1: 'value',
+      key2: {
+        childKey1: 'value'
+      }
+    };
+    var mine = {
+      key1: 'value'
+    };
+    var expected = [
+      {
+        kind: 'C',
+        path: [ 'key2'],
+        parent: parent.key2,
+        theirs: theirs.key2,
+        mine: mine.key2
+      }
+    ];
+    assert.deepEqual(diff(parent, theirs, mine), expected);
+  });
 });
 
 // TODO These are probably useful tests https://github.com/falsecz/3-way-merge/blob/master/test/test.coffee

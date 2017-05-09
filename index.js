@@ -136,9 +136,7 @@ function processKeyValuePair(key, value, parent, theirs, mine, path, options) {
     }
     else if (_.isObject(value)) {
       path.push(key);
-      if ((_.isUndefined(parentValue) || (!_.isObject(parentValue) && parentValue !== null))
-          || (_.isUndefined(theirsValue) || (!_.isObject(theirsValue) && theirsValue !== null))
-          || (_.isUndefined(mineValue) || (!_.isObject(mineValue) && mineValue !== null))) {
+      if ((typeof parentValue !== typeof theirsValue || typeof parentValue !== typeof mineValue) && typeof theirsValue !== typeof mineValue) {
         var differences = compareValues(parentValue, theirsValue, mineValue, path, options[key] || {});
       } else {
         var differences = recurse(parentValue, theirsValue, mineValue, path, options[key] || {});
@@ -217,7 +215,8 @@ function compareValues(parent, theirs, mine, path, options) {
       theirs: theirs
     };
   }
-  else if(_.isArray(parent) || _.isArray(mine) || _.isArray(theirs)) {
+  else if((_.isArray(parent) || _.isArray(mine) || _.isArray(theirs))
+            || (_.isObject(parent) || _.isObject(mine) || _.isObject(theirs))) {
     // Maintain array order unless flagged as ignoreOrder
     if (!_.isUndefined(options) && options['ignoreOrder']) {
       parent = _.isArray(parent) ? parent.sort() : parent;
